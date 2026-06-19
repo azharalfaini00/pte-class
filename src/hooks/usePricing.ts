@@ -140,6 +140,7 @@ export const usePricing = () => {
         { data: faqs },
         { data: testimonials },
         { data: centers },
+        { data: placementQuestions },
         { data: settings }
       ] = await Promise.all([
         supabase.from('pricing_items').select('*'),
@@ -151,16 +152,6 @@ export const usePricing = () => {
         supabase.from('placement_questions').select('*'),
         supabase.from('settings').select('*').eq('id', 'global').single()
       ]);
-
-      const [pricingRes, tutorsRes, schedulesRes, faqsRes, testimonialsRes, centersRes, placementRes, settingsRes] = results;
-      const pricingItems = pricingRes.data;
-      const tutors = tutorsRes.data;
-      const schedules = schedulesRes.data;
-      const faqs = faqsRes.data;
-      const testimonials = testimonialsRes.data;
-      const centers = centersRes.data;
-      const placementQuestions = placementRes.data;
-      const settings = settingsRes.data;
 
       if (pricingItems) {
         const paket = pricingItems.filter((i: any) => i.category === 'paket');
