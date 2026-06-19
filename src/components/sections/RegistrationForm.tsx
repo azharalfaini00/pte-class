@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { PaymentSimulationModal } from '../ui/PaymentSimulationModal';
 import { Send, User, Phone, Mail, Book, Target, CalendarDays } from 'lucide-react';
 import { usePricing } from '../../hooks/usePricing';
+import { supabase } from '../../lib/supabase';
 
 export const RegistrationForm: React.FC = () => {
   const { pricing } = usePricing();
@@ -27,12 +28,20 @@ export const RegistrationForm: React.FC = () => {
   const [paymentItemName, setPaymentItemName] = useState('');
 
   useEffect(() => {
-    fetch('/api/students')
-      .then(res => res.json())
-      .then(data => {
-        if (data.students) setStudentCount(data.students.length);
-      })
-      .catch(console.error);
+    const fetchStudentCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('students')
+          .select('*', { count: 'exact', head: true });
+        
+        if (!error && count !== null) {
+          setStudentCount(count);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchStudentCount();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,14 +53,19 @@ export const RegistrationForm: React.FC = () => {
     
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      const newStudentId = `student_${Date.now()}`;
+      const { error } = await supabase.from('students').insert({
+        id: newStudentId,
+        name: formData.name,
+        whatsapp: formData.whatsapp,
+        email: formData.email,
+        program: formData.program,
+        schedule: formData.schedule,
+        payment_status: 'pending'
       });
-      if (res.ok) {
-        const result = await res.json();
-        setRegisteredStudentId(result.student.id);
+
+      if (!error) {
+        setRegisteredStudentId(newStudentId);
         
         // Calculate Amount & Item Name based on selected program
         let amount = 0;
@@ -72,9 +86,11 @@ export const RegistrationForm: React.FC = () => {
         setIsPaymentModalOpen(true);
         
       } else {
+        console.error(error);
         alert("Gagal mendaftar. Silakan coba lagi.");
       }
     } catch (err) {
+      console.error(err);
       alert("Terjadi kesalahan saat menghubungi server.");
     } finally {
       setIsSubmitting(false);
