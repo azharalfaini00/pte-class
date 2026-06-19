@@ -165,7 +165,11 @@ export const OwnerDashboard: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="hidden sm:flex items-center gap-2 !px-4 !py-2.5 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-xl text-sm font-semibold shadow-sm"
-                onClick={() => window.location.href = '/'} 
+                onClick={async () => {
+                  const { supabase } = await import('../../lib/supabase');
+                  await supabase.auth.signOut();
+                  window.location.href = '/';
+                }} 
               >
                 <LogOut className="w-4 h-4" />
                 <span>Lihat Website</span>

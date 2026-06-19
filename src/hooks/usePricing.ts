@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 export interface PriceItem {
   id: string;
@@ -124,15 +125,52 @@ export const usePricing = () => {
 
   const fetchPricing = async () => {
     try {
-      const response = await fetch('/api/pricing');
-      if (response.ok) {
-        const data = await response.json();
-        // Merge with defaults to ensure faqs and testimonials exist if data is old
-        setPricing({ ...defaultPricing, ...data });
+      const [
+        { data: pricingItems },
+        { data: tutors },
+        { data: schedules },
+        { data: faqs },
+        { data: testimonials },
+        { data: centers },
+        { data: settings }
+      ] = await Promise.all([
+        supabase.from('pricing_items').select('*'),
+        supabase.from('tutors').select('*'),
+        supabase.from('schedules').select('*'),
+        supabase.from('faqs').select('*'),
+        supabase.from('testimonials').select('*'),
+        supabase.from('centers').select('*'),
+        supabase.from('settings').select('*').eq('id', 'global').single()
+      ]);
+
+      if (pricingItems) {
+        const paket = pricingItems.filter(i => i.category === 'paket');
+        const satuan = pricingItems.filter(i => i.category === 'satuan');
+        const pte = pricingItems.filter(i => i.category === 'pte');
+        
+        const mapPriceItem = (item: any) => ({
+          id: item.id,
+          name: item.name,
+          basePrice: item.base_price,
+          discountPercentage: item.discount_percentage
+        });
+
+        setPricing({
+          paket: paket.length > 0 ? paket.map(mapPriceItem) : defaultPricing.paket,
+          satuan: satuan.length > 0 ? satuan.map(mapPriceItem) : defaultPricing.satuan,
+          pte: pte.length > 0 ? pte.map(mapPriceItem) : defaultPricing.pte,
+          tutors: tutors?.length ? tutors : defaultPricing.tutors,
+          schedules: schedules?.length ? schedules : defaultPricing.schedules,
+          faqs: faqs?.length ? faqs : defaultPricing.faqs,
+          testimonials: testimonials?.length ? testimonials.map(t => ({...t, isApproved: t.is_approved})) : defaultPricing.testimonials,
+          centers: centers?.length ? centers : defaultPricing.centers,
+          settings: settings ? { demoVideoUrl: settings.demo_video_url } : defaultPricing.settings
+        });
       }
     } catch (error) {
       console.error("Error fetching pricing from backend", error);
       // Fallback to default if backend is unavailable
+      setPricing(defaultPricing);
     } finally {
       setIsLoading(false);
     }
@@ -152,22 +190,32 @@ export const usePricing = () => {
 
   const savePricing = async () => {
     try {
-      const response = await fetch('/api/pricing', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pricing)
-      });
+      const pricingItems = [
+        ...pricing.paket.map(p => ({ id: p.id, category: 'paket', name: p.name, base_price: p.basePrice, discount_percentage: p.discountPercentage })),
+        ...pricing.satuan.map(p => ({ id: p.id, category: 'satuan', name: p.name, base_price: p.basePrice, discount_percentage: p.discountPercentage })),
+        ...pricing.pte.map(p => ({ id: p.id, category: 'pte', name: p.name, base_price: p.basePrice, discount_percentage: p.discountPercentage }))
+      ];
+      await supabase.from('pricing_items').upsert(pricingItems);
       
-      if (response.ok) {
-        alert("Harga dan data berhasil disimpan ke server!");
-      } else {
-        alert("Gagal menyimpan data ke server.");
+      if (pricing.tutors) await supabase.from('tutors').upsert(pricing.tutors);
+      if (pricing.schedules) await supabase.from('schedules').upsert(pricing.schedules);
+      if (pricing.faqs) await supabase.from('faqs').upsert(pricing.faqs);
+      
+      if (pricing.testimonials) {
+        const mappedTestimonials = pricing.testimonials.map(t => ({
+          id: t.id, category: t.category, name: t.name, profession: t.profession, photo: t.photo, rating: t.rating, before: t.before, after: t.after, text: t.text,
+          is_approved: t.isApproved
+        }));
+        await supabase.from('testimonials').upsert(mappedTestimonials);
       }
+
+      if (pricing.centers) await supabase.from('centers').upsert(pricing.centers);
+      if (pricing.settings) await supabase.from('settings').upsert({ id: 'global', demo_video_url: pricing.settings.demoVideoUrl });
+
+      alert("Harga dan data berhasil disimpan ke Supabase!");
     } catch (error) {
       console.error("Error saving pricing", error);
-      alert("Terjadi kesalahan koneksi.");
+      alert("Terjadi kesalahan koneksi ke Supabase.");
     }
   };
 
@@ -207,11 +255,12 @@ export const usePricing = () => {
     }));
   };
 
-  const removeTutor = (id: string) => {
+  const removeTutor = async (id: string) => {
     setPricing((prev) => ({
       ...prev,
       tutors: prev.tutors?.filter(tutor => tutor.id !== id)
     }));
+    await supabase.from('tutors').delete().eq('id', id);
   };
 
   // Schedules
@@ -235,11 +284,12 @@ export const usePricing = () => {
     }));
   };
 
-  const removeSchedule = (id: string) => {
+  const removeSchedule = async (id: string) => {
     setPricing((prev) => ({
       ...prev,
       schedules: prev.schedules?.filter(s => s.id !== id)
     }));
+    await supabase.from('schedules').delete().eq('id', id);
   };
 
   // FAQs
@@ -264,31 +314,34 @@ export const usePricing = () => {
     }));
   };
 
-  const removeFAQ = (id: string) => {
+  const removeFAQ = async (id: string) => {
     setPricing((prev) => ({
       ...prev,
       faqs: prev.faqs?.filter(faq => faq.id !== id)
     }));
+    await supabase.from('faqs').delete().eq('id', id);
   };
 
   // Testimonials
-  const addTestimonial = (testimonialData: Omit<TestimonialItem, 'id' | 'isApproved'>) => {
+  const addTestimonial = async (testimonialData: Omit<TestimonialItem, 'id' | 'isApproved'>) => {
     const newTestimonial: TestimonialItem = {
       ...testimonialData,
       id: `testi_${Date.now()}`,
-      isApproved: false // Requires approval by default
+      isApproved: false
     };
     setPricing((prev) => ({
       ...prev,
       testimonials: [newTestimonial, ...(prev.testimonials || [])]
     }));
-    // We optionally save right away so the user review is persistent (in a real app, this would hit a separate POST /api/reviews)
-    // To simulate backend, we can just save pricing state directly
-    setTimeout(() => {
-      // In a real implementation we would fetch the current state, append, and post.
-      // But since we modify state, we just alert.
-      alert("Ulasan Anda telah dikirim dan menunggu persetujuan admin!");
-    }, 500);
+    
+    // Insert to supabase directly so we don't have to wait for owner's save
+    const mapped = {
+      id: newTestimonial.id, category: newTestimonial.category, name: newTestimonial.name, profession: newTestimonial.profession, photo: newTestimonial.photo, rating: newTestimonial.rating, before: newTestimonial.before, after: newTestimonial.after, text: newTestimonial.text,
+      is_approved: false
+    };
+    await supabase.from('testimonials').insert([mapped]);
+    
+    alert("Ulasan Anda telah dikirim dan menunggu persetujuan admin!");
   };
 
   const updateTestimonial = (id: string, field: keyof TestimonialItem, value: any) => {
@@ -300,11 +353,12 @@ export const usePricing = () => {
     }));
   };
 
-  const removeTestimonial = (id: string) => {
+  const removeTestimonial = async (id: string) => {
     setPricing((prev) => ({
       ...prev,
       testimonials: prev.testimonials?.filter(t => t.id !== id)
     }));
+    await supabase.from('testimonials').delete().eq('id', id);
   };
 
   // Centers
@@ -328,29 +382,30 @@ export const usePricing = () => {
     }));
   };
 
-  const removeCenter = (id: string) => {
+  const removeCenter = async (id: string) => {
     setPricing((prev) => ({
       ...prev,
       centers: prev.centers?.filter(c => c.id !== id)
     }));
+    await supabase.from('centers').delete().eq('id', id);
   };
 
   const uploadImage = async (file: File): Promise<string | null> => {
-    const formData = new FormData();
-    formData.append('image', file);
-    try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data.url;
-      }
-    } catch (error) {
-      console.error("Error uploading image", error);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('uploads')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error("Error uploading image", uploadError);
+      return null;
     }
-    return null;
+
+    const { data } = supabase.storage.from('uploads').getPublicUrl(filePath);
+    return data.publicUrl;
   };
 
   const calculateFinalPrice = (basePrice: number, discountPercentage: number) => {
