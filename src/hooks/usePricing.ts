@@ -176,16 +176,37 @@ export const usePricing = () => {
     }
   };
 
-  const updatePriceItem = (category: keyof PricingState, id: string, newBasePrice: number, newDiscountPercentage: number) => {
+  const updatePriceItem = (category: keyof PricingState, id: string, field: keyof PriceItem, value: any) => {
     setPricing((prev) => {
       // @ts-ignore
       const updatedCategory = prev[category].map((item: any) => 
         item.id === id 
-          ? { ...item, basePrice: newBasePrice, discountPercentage: newDiscountPercentage } 
+          ? { ...item, [field]: value } 
           : item
       );
       return { ...prev, [category]: updatedCategory };
     });
+  };
+
+  const addPriceItem = (category: 'paket' | 'satuan' | 'pte') => {
+    const newItem: PriceItem = {
+      id: `${category}_${Date.now()}`,
+      name: 'Kelas Baru',
+      basePrice: 0,
+      discountPercentage: 0
+    };
+    setPricing((prev) => ({
+      ...prev,
+      [category]: [...(prev[category] as PriceItem[]), newItem]
+    }));
+  };
+
+  const removePriceItem = async (category: 'paket' | 'satuan' | 'pte', id: string) => {
+    setPricing((prev) => ({
+      ...prev,
+      [category]: (prev[category] as PriceItem[]).filter(item => item.id !== id)
+    }));
+    await supabase.from('pricing_items').delete().eq('id', id);
   };
 
   const savePricing = async () => {
@@ -418,7 +439,7 @@ export const usePricing = () => {
 
   return { 
     pricing, isLoading, 
-    updatePriceItem, updateSettings, 
+    updatePriceItem, addPriceItem, removePriceItem, updateSettings, 
     updateTutor, addTutor, removeTutor, 
     addSchedule, updateSchedule, removeSchedule,
     addFAQ, updateFAQ, removeFAQ,
