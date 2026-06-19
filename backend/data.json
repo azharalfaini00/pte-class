@@ -1,0 +1,234 @@
+{
+  "paket": [
+    {
+      "id": "paket_2w",
+      "name": "2 Minggu",
+      "basePrice": 500000,
+      "discountPercentage": 10
+    },
+    {
+      "id": "paket_1m",
+      "name": "1 Bulan",
+      "basePrice": 950000,
+      "discountPercentage": 15
+    },
+    {
+      "id": "paket_3m",
+      "name": "3 Bulan",
+      "basePrice": 2500000,
+      "discountPercentage": 20
+    }
+  ],
+  "satuan": [
+    {
+      "id": "satuan_speaking",
+      "name": "Speaking",
+      "basePrice": 250000,
+      "discountPercentage": 60
+    },
+    {
+      "id": "satuan_grammar",
+      "name": "Grammar",
+      "basePrice": 200000,
+      "discountPercentage": 50
+    },
+    {
+      "id": "satuan_vocab",
+      "name": "Vocabulary",
+      "basePrice": 200000,
+      "discountPercentage": 50
+    },
+    {
+      "id": "satuan_pronun",
+      "name": "Pronunciation",
+      "basePrice": 200000,
+      "discountPercentage": 52
+    }
+  ],
+  "pte": [
+    {
+      "id": "pte_2w",
+      "name": "2 Minggu",
+      "basePrice": 750000,
+      "discountPercentage": 20
+    },
+    {
+      "id": "pte_1m",
+      "name": "1 Bulan",
+      "basePrice": 1400000,
+      "discountPercentage": 28
+    },
+    {
+      "id": "pte_15m",
+      "name": "1.5 Bulan",
+      "basePrice": 2000000,
+      "discountPercentage": 24
+    }
+  ],
+  "settings": {
+    "demoVideoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+  },
+  "tutors": [
+    {
+      "id": "tutor_1",
+      "name": "Sarah Jenkins, M.Ed.",
+      "photo": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      "certifications": [
+        "CELTA Certified",
+        "IELTS Examiner"
+      ],
+      "experience": "8+ Tahun Mengajar",
+      "specialty": "Speaking Coach & IELTS",
+      "achievements": "Membantu 500+ siswa mencapai band 7.0+ IELTS dalam 2 tahun terakhir."
+    },
+    {
+      "id": "tutor_2",
+      "name": "David Chen, Ph.D.",
+      "photo": "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      "certifications": [
+        "TESOL Certified",
+        "PTE Academic Expert"
+      ],
+      "experience": "10+ Tahun Mengajar",
+      "specialty": "PTE Specialist",
+      "achievements": "Author buku 'PTE Success Strategies' dengan tingkat kelulusan siswa 95%."
+    }
+  ],
+  "schedules": [
+    {
+      "id": "morning",
+      "name": "Pagi (09.00 - 12.00)"
+    },
+    {
+      "id": "afternoon",
+      "name": "Siang / Sore (13.00 - 17.00)"
+    },
+    {
+      "id": "evening",
+      "name": "Malam (19.00 - 21.00) - Paling Diminati"
+    },
+    {
+      "id": "weekend",
+      "name": "Akhir Pekan (Sabtu & Minggu)"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "faq_1",
+      "q": "Apakah kelas diadakan secara online atau offline?",
+      "a": "Saat ini seluruh kelas diadakan 100% online secara live interaktif menggunakan Zoom Premium. Anda bisa belajar dari mana saja tanpa harus datang ke tempat kursus."
+    },
+    {
+      "id": "faq_2",
+      "q": "Apakah ada placement test sebelum kelas dimulai?",
+      "a": "Tentu. Setiap siswa diwajibkan mengikuti Placement Test Gratis terlebih dahulu agar kami dapat merekomendasikan kelas yang paling sesuai dengan level Anda."
+    },
+    {
+      "id": "faq_3",
+      "q": "Apakah saya akan mendapatkan sertifikat?",
+      "a": "Ya, setiap siswa yang menyelesaikan program dan memenuhi standar kehadiran serta nilai akhir akan mendapatkan e-Certificate resmi dari EnglishPRO Linguits Academy."
+    },
+    {
+      "id": "faq_4",
+      "q": "Berapa lama durasi satu program?",
+      "a": "Durasi bervariasi tergantung level. Program Beginner hingga Pre-Intermediate memakan waktu 8 minggu, sedangkan Intermediate hingga Advanced 12 minggu. Untuk PTE Intensive memakan waktu 8 minggu."
+    },
+    {
+      "id": "faq_5",
+      "q": "Bagaimana sistem pembayarannya?",
+      "a": "Pembayaran dapat dilakukan melalui transfer bank, virtual account, e-wallet, maupun cicilan 0% hingga 3 bulan khusus untuk program bundle."
+    },
+    {
+      "id": "faq_6",
+      "q": "Apakah saya bisa mengulang kelas jika belum paham?",
+      "a": "Ya, kami memberikan Garansi Mengulang Kelas secara gratis untuk program tertentu jika Anda merasa belum mencapai target pembelajaran (syarat kehadiran 90% terpenuhi)."
+    },
+    {
+      "id": "faq_7",
+      "q": "Apakah tersedia kelas Private (1-on-1)?",
+      "a": "Ya, kami menyediakan kelas Private bagi Anda yang membutuhkan jadwal fleksibel dan kurikulum yang lebih disesuaikan dengan kebutuhan spesifik Anda."
+    },
+    {
+      "id": "faq_8",
+      "q": "Apakah kelas ini cocok untuk pemula yang belum bisa bahasa Inggris sama sekali?",
+      "a": "Sangat cocok! Kami memiliki kelas Beginner Foundation yang didesain khusus untuk pemula. Tutor akan mengajarkan dari dasar (A1) dengan sabar dan menyenangkan."
+    }
+  ],
+  "centers": [
+    {
+      "id": "center_2",
+      "name": "Bandung (Dago Hub)"
+    },
+    {
+      "id": "center_4",
+      "name": "Surabaya (Gubeng Prime)"
+    },
+    {
+      "id": "center_1781887915280",
+      "name": "Karawang Barat"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "testi_1",
+      "category": "PTE",
+      "name": "Budi Santoso",
+      "profession": "Mahasiswa S2",
+      "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+      "rating": 5,
+      "before": "Skor PTE stuck di 52, kesulitan di Speaking section.",
+      "after": "Skor naik menjadi 71 dalam 2 bulan. Lolos beasiswa LPDP!",
+      "text": "Metode belajarnya sangat terstruktur. Tutor sangat detail dalam memberikan feedback untuk speaking dan writing. Mock test yang diberikan sangat mirip dengan aslinya.",
+      "isApproved": true
+    },
+    {
+      "id": "testi_2",
+      "category": "Speaking",
+      "name": "Rina Amelia",
+      "profession": "Marketing Executive",
+      "photo": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+      "rating": 5,
+      "before": "Gugup dan blank saat presentasi bahasa Inggris.",
+      "after": "Percaya diri presentasi di depan klien internasional.",
+      "text": "Kelas Speaking di EnglishPRO Linguits Academy benar-benar mengubah mindset saya. Atmosfer kelas yang supportive membuat saya tidak takut salah lagi saat berbicara.",
+      "isApproved": true
+    },
+    {
+      "id": "testi_3",
+      "category": "Business English",
+      "name": "Andi Pratama",
+      "profession": "Software Engineer",
+      "photo": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+      "rating": 5,
+      "before": "Sering salah paham saat email dan meeting dengan tim luar.",
+      "after": "Berhasil lolos wawancara kerja di perusahaan Singapura.",
+      "text": "Materi Business English sangat aplikatif. Saya diajarkan cara negosiasi, menulis email profesional, dan tips wawancara yang terbukti ampuh.",
+      "isApproved": true
+    },
+    {
+      "id": "testi_4",
+      "category": "Grammar",
+      "name": "Siti Nurhaliza",
+      "profession": "Fresh Graduate",
+      "photo": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+      "rating": 4,
+      "before": "Selalu bingung menggunakan tenses yang tepat.",
+      "after": "Menulis esai dan cover letter tanpa grammatical error.",
+      "text": "Ternyata grammar itu mudah kalau diajarkan dengan cara yang tepat. Tidak sekadar menghafal rumus, tapi praktik langsung.",
+      "isApproved": true
+    }
+  ],
+  "students": [
+    {
+      "name": "Azhar Alfaini",
+      "whatsapp": "085860709120",
+      "email": "aalfaini25@gmail.com",
+      "level": "beginner",
+      "program": "satuan_speaking",
+      "schedule": "morning",
+      "id": "1781884247933",
+      "registeredAt": "2026-06-19T15:50:47.933Z",
+      "paymentStatus": "pending"
+    }
+  ]
+}

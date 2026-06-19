@@ -1,0 +1,6 @@
+{
+  "name": "Landing Page Kursus Bahasa Inggris",
+  "description": "Landing page modern dan informatif untuk kursus bahasa Inggris, lengkap dengan daftar kelas, testimoni, dan formulir pendaftaran interaktif.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
