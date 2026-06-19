@@ -169,7 +169,10 @@ export const usePricing = () => {
           paket: paket.length > 0 ? paket.map(mapPriceItem) : defaultPricing.paket,
           satuan: satuan.length > 0 ? satuan.map(mapPriceItem) : defaultPricing.satuan,
           pte: pte.length > 0 ? pte.map(mapPriceItem) : defaultPricing.pte,
-          tutors: tutors?.length ? tutors : defaultPricing.tutors,
+          tutors: tutors?.length ? tutors.map((t: any) => ({
+            ...t,
+            certifications: typeof t.certifications === 'string' ? JSON.parse(t.certifications) : t.certifications
+          })) : defaultPricing.tutors,
           schedules: schedules?.length ? schedules : defaultPricing.schedules,
           faqs: faqs?.length ? faqs : defaultPricing.faqs,
           testimonials: testimonials?.length ? testimonials.map(t => ({...t, isApproved: t.is_approved})) : defaultPricing.testimonials,
@@ -232,21 +235,39 @@ export const usePricing = () => {
         ...pricing.satuan.map(p => ({ id: p.id, category: 'satuan', name: p.name, base_price: p.basePrice, discount_percentage: p.discountPercentage })),
         ...pricing.pte.map(p => ({ id: p.id, category: 'pte', name: p.name, base_price: p.basePrice, discount_percentage: p.discountPercentage }))
       ];
-      await supabase.from('pricing_items').upsert(pricingItems);
+      const { error: e1 } = await supabase.from('pricing_items').upsert(pricingItems);
+      if (e1) throw e1;
       
-      if (pricing.tutors) await supabase.from('tutors').upsert(pricing.tutors);
-      if (pricing.schedules) await supabase.from('schedules').upsert(pricing.schedules);
-      if (pricing.faqs) await supabase.from('faqs').upsert(pricing.faqs);
+      if (pricing.tutors) {
+        const mappedTutors = pricing.tutors.map(t => ({
+          ...t,
+          certifications: Array.isArray(t.certifications) ? JSON.stringify(t.certifications) : t.certifications
+        }));
+        const { error: e2 } = await supabase.from('tutors').upsert(mappedTutors);
+        if (e2) throw e2;
+      }
+      if (pricing.schedules) {
+        const { error: e3 } = await supabase.from('schedules').upsert(pricing.schedules);
+        if (e3) throw e3;
+      }
+      if (pricing.faqs) {
+        const { error: e4 } = await supabase.from('faqs').upsert(pricing.faqs);
+        if (e4) throw e4;
+      }
       
       if (pricing.testimonials) {
         const mappedTestimonials = pricing.testimonials.map(t => ({
           id: t.id, category: t.category, name: t.name, profession: t.profession, photo: t.photo, rating: t.rating, before: t.before, after: t.after, text: t.text,
           is_approved: t.isApproved
         }));
-        await supabase.from('testimonials').upsert(mappedTestimonials);
+        const { error: e5 } = await supabase.from('testimonials').upsert(mappedTestimonials);
+        if (e5) throw e5;
       }
 
-      if (pricing.centers) await supabase.from('centers').upsert(pricing.centers);
+      if (pricing.centers) {
+        const { error: e6 } = await supabase.from('centers').upsert(pricing.centers);
+        if (e6) throw e6;
+      }
       if (pricing.placementQuestions) {
         const pqs = pricing.placementQuestions.map(q => ({
           id: q.id,
@@ -254,14 +275,18 @@ export const usePricing = () => {
           options: JSON.stringify(q.options),
           correct_answer: q.correctAnswer
         }));
-        await supabase.from('placement_questions').upsert(pqs);
+        const { error: e7 } = await supabase.from('placement_questions').upsert(pqs);
+        if (e7) throw e7;
       }
-      if (pricing.settings) await supabase.from('settings').upsert({ id: 'global', demo_video_url: pricing.settings.demoVideoUrl });
+      if (pricing.settings) {
+        const { error: e8 } = await supabase.from('settings').upsert({ id: 'global', demo_video_url: pricing.settings.demoVideoUrl });
+        if (e8) throw e8;
+      }
 
       alert("Harga dan data berhasil disimpan ke Supabase!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving pricing", error);
-      alert("Terjadi kesalahan koneksi ke Supabase.");
+      alert(`Gagal menyimpan: ${error.message || "Terjadi kesalahan koneksi ke Supabase."}`);
     }
   };
 
