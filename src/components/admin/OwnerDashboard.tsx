@@ -12,6 +12,7 @@ export const OwnerDashboard: React.FC = () => {
     addFAQ, updateFAQ, removeFAQ,
     addTestimonial, updateTestimonial, removeTestimonial,
     addCenter, updateCenter, removeCenter,
+    addPlacementQuestion, updatePlacementQuestion, removePlacementQuestion,
     uploadImage, savePricing, calculateFinalPrice, formatRupiah 
   } = usePricing();
   const [uploadingTutorId, setUploadingTutorId] = useState<string | null>(null);
