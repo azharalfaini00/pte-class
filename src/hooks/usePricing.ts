@@ -51,6 +51,13 @@ export interface TestimonialItem {
   isApproved: boolean;
 }
 
+export interface PlacementQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+}
+
 export interface PricingState {
   paket: PriceItem[];
   satuan: PriceItem[];
@@ -61,6 +68,7 @@ export interface PricingState {
   faqs?: FAQItem[];
   testimonials?: TestimonialItem[];
   centers?: CenterItem[];
+  placementQuestions?: PlacementQuestion[];
 }
 
 const defaultPricing: PricingState = {
@@ -140,13 +148,24 @@ export const usePricing = () => {
         supabase.from('faqs').select('*'),
         supabase.from('testimonials').select('*'),
         supabase.from('centers').select('*'),
+        supabase.from('placement_questions').select('*'),
         supabase.from('settings').select('*').eq('id', 'global').single()
       ]);
 
+      const [pricingRes, tutorsRes, schedulesRes, faqsRes, testimonialsRes, centersRes, placementRes, settingsRes] = results;
+      const pricingItems = pricingRes.data;
+      const tutors = tutorsRes.data;
+      const schedules = schedulesRes.data;
+      const faqs = faqsRes.data;
+      const testimonials = testimonialsRes.data;
+      const centers = centersRes.data;
+      const placementQuestions = placementRes.data;
+      const settings = settingsRes.data;
+
       if (pricingItems) {
-        const paket = pricingItems.filter(i => i.category === 'paket');
-        const satuan = pricingItems.filter(i => i.category === 'satuan');
-        const pte = pricingItems.filter(i => i.category === 'pte');
+        const paket = pricingItems.filter((i: any) => i.category === 'paket');
+        const satuan = pricingItems.filter((i: any) => i.category === 'satuan');
+        const pte = pricingItems.filter((i: any) => i.category === 'pte');
         
         const mapPriceItem = (item: any) => ({
           id: item.id,
@@ -164,6 +183,12 @@ export const usePricing = () => {
           faqs: faqs?.length ? faqs : defaultPricing.faqs,
           testimonials: testimonials?.length ? testimonials.map(t => ({...t, isApproved: t.is_approved})) : defaultPricing.testimonials,
           centers: centers?.length ? centers : defaultPricing.centers,
+          placementQuestions: placementQuestions?.length ? placementQuestions.map((q: any) => ({
+            id: q.id,
+            question: q.question,
+            options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
+            correctAnswer: q.correct_answer
+          })) : defaultPricing.placementQuestions,
           settings: settings ? { demoVideoUrl: settings.demo_video_url } : defaultPricing.settings
         });
       }
@@ -231,6 +256,15 @@ export const usePricing = () => {
       }
 
       if (pricing.centers) await supabase.from('centers').upsert(pricing.centers);
+      if (pricing.placementQuestions) {
+        const pqs = pricing.placementQuestions.map(q => ({
+          id: q.id,
+          question: q.question,
+          options: JSON.stringify(q.options),
+          correct_answer: q.correctAnswer
+        }));
+        await supabase.from('placement_questions').upsert(pqs);
+      }
       if (pricing.settings) await supabase.from('settings').upsert({ id: 'global', demo_video_url: pricing.settings.demoVideoUrl });
 
       alert("Harga dan data berhasil disimpan ke Supabase!");
@@ -411,6 +445,37 @@ export const usePricing = () => {
     await supabase.from('centers').delete().eq('id', id);
   };
 
+  // Placement Questions
+  const addPlacementQuestion = () => {
+    const newQuestion: PlacementQuestion = {
+      id: `pq_${Date.now()}`,
+      question: "Pertanyaan Baru?",
+      options: ["Opsi A", "Opsi B", "Opsi C", "Opsi D"],
+      correctAnswer: 0
+    };
+    setPricing((prev) => ({
+      ...prev,
+      placementQuestions: [...(prev.placementQuestions || []), newQuestion]
+    }));
+  };
+
+  const updatePlacementQuestion = (id: string, field: keyof PlacementQuestion, value: any) => {
+    setPricing((prev) => ({
+      ...prev,
+      placementQuestions: prev.placementQuestions?.map(q => 
+        q.id === id ? { ...q, [field]: value } : q
+      )
+    }));
+  };
+
+  const removePlacementQuestion = async (id: string) => {
+    setPricing((prev) => ({
+      ...prev,
+      placementQuestions: prev.placementQuestions?.filter(q => q.id !== id)
+    }));
+    await supabase.from('placement_questions').delete().eq('id', id);
+  };
+
   const uploadImage = async (file: File): Promise<string | null> => {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;
@@ -421,7 +486,8 @@ export const usePricing = () => {
       .upload(filePath, file);
 
     if (uploadError) {
-      console.error("Error uploading image", uploadError);
+      console.error("Error uploading image:", uploadError);
+      alert("Gagal mengunggah foto. Pastikan bucket 'uploads' sudah dibuat dan diatur ke Public di menu Storage Supabase Anda.");
       return null;
     }
 
@@ -445,6 +511,7 @@ export const usePricing = () => {
     addFAQ, updateFAQ, removeFAQ,
     addTestimonial, updateTestimonial, removeTestimonial,
     addCenter, updateCenter, removeCenter,
+    addPlacementQuestion, updatePlacementQuestion, removePlacementQuestion,
     uploadImage, savePricing, calculateFinalPrice, formatRupiah 
   };
 };

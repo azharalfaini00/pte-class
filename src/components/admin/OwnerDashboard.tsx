@@ -16,7 +16,7 @@ export const OwnerDashboard: React.FC = () => {
   } = usePricing();
   const [uploadingTutorId, setUploadingTutorId] = useState<string | null>(null);
   const [students, setStudents] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'classes' | 'tutors' | 'faqs' | 'testimonials' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'students' | 'classes' | 'tutors' | 'faqs' | 'testimonials' | 'settings' | 'placement'>('overview');
 
   useEffect(() => {
     fetch('/api/students')
@@ -226,6 +226,7 @@ export const OwnerDashboard: React.FC = () => {
             { id: 'overview', label: 'Overview', icon: <LayoutDashboard className="w-4 h-4" /> },
             { id: 'students', label: 'Data Siswa', icon: <Users className="w-4 h-4" /> },
             { id: 'classes', label: 'Manajemen Kelas', icon: <BookOpen className="w-4 h-4" /> },
+            { id: 'placement', label: 'Placement Test', icon: <CheckCircle2 className="w-4 h-4" /> },
             { id: 'tutors', label: 'Tutor', icon: <Star className="w-4 h-4" /> },
             { id: 'faqs', label: 'FAQ', icon: <HelpCircle className="w-4 h-4" /> },
             { id: 'testimonials', label: 'Testimoni', icon: <MessageSquare className="w-4 h-4" /> },
@@ -245,6 +246,78 @@ export const OwnerDashboard: React.FC = () => {
             </button>
           ))}
         </div>
+
+        {/* Tab Content: Placement Test */}
+        {activeTab === 'placement' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-800">Soal Placement Test</h2>
+                <p className="text-slate-500 mt-1 text-sm">Kelola pertanyaan, pilihan ganda, dan kunci jawaban untuk tes penempatan online.</p>
+              </div>
+              <Button onClick={() => addPlacementQuestion()} variant="primary" icon={<Plus className="w-4 h-4" />}>
+                Tambah Soal
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {pricing.placementQuestions?.map((q, qIndex) => (
+                <div key={q.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="flex justify-between gap-4 mb-4">
+                    <div className="flex-1 space-y-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pertanyaan {qIndex + 1}</label>
+                      <input 
+                        type="text" 
+                        value={q.question} 
+                        onChange={(e) => updatePlacementQuestion(q.id, 'question', e.target.value)}
+                        className="w-full text-lg font-bold text-slate-800 border-b border-transparent focus:border-indigo-500 py-1 focus:outline-none transition-colors bg-transparent"
+                      />
+                    </div>
+                    <button 
+                      onClick={() => removePlacementQuestion(q.id)}
+                      className="text-slate-400 hover:text-red-500 p-2 h-fit rounded-lg hover:bg-red-50 transition-colors"
+                      title="Hapus Soal"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {q.options.map((opt, optIndex) => (
+                      <div key={optIndex} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${q.correctAnswer === optIndex ? 'border-green-400 bg-green-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <input 
+                          type="radio" 
+                          name={`correct-${q.id}`} 
+                          checked={q.correctAnswer === optIndex}
+                          onChange={() => updatePlacementQuestion(q.id, 'correctAnswer', optIndex)}
+                          className="w-4 h-4 text-green-500 focus:ring-green-400"
+                        />
+                        <div className="flex-1 flex items-center gap-2">
+                          <span className="font-bold text-slate-400 text-sm">{String.fromCharCode(65 + optIndex)}.</span>
+                          <input 
+                            type="text" 
+                            value={opt} 
+                            onChange={(e) => {
+                              const newOpts = [...q.options];
+                              newOpts[optIndex] = e.target.value;
+                              updatePlacementQuestion(q.id, 'options', newOpts);
+                            }}
+                            className="w-full text-sm text-slate-700 bg-transparent focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {(!pricing.placementQuestions || pricing.placementQuestions.length === 0) && (
+                <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
+                  <p className="text-slate-500">Belum ada soal placement test.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Tab Content: Overview */}
         {activeTab === 'overview' && (

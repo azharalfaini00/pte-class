@@ -2,44 +2,29 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../ui/Button';
 import { Clock, Mic, BookOpen, PenTool, Map, ArrowRight, RotateCcw, Award } from 'lucide-react';
-
-const questions = [
-  {
-    question: "Pilih kalimat yang benar secara tata bahasa (Grammar):",
-    options: [
-      "She don't like apples.",
-      "She doesn't likes apples.",
-      "She doesn't like apples.",
-      "She don't likes apples."
-    ],
-    correctAnswer: 2
-  },
-  {
-    question: "Pilih sinonim yang paling tepat untuk kata 'Enormous'.",
-    options: [
-      "Tiny (Kecil)",
-      "Huge (Sangat Besar)",
-      "Average (Rata-rata)",
-      "Weak (Lemah)"
-    ],
-    correctAnswer: 1
-  },
-  {
-    question: "Lengkapi kalimat ini: If I _____ rich, I would travel the world.",
-    options: [
-      "am",
-      "was",
-      "were",
-      "have been"
-    ],
-    correctAnswer: 2
-  }
-];
+import { usePricing } from '../../hooks/usePricing';
 
 export const PlacementTest: React.FC = () => {
+  const { pricing } = usePricing();
   const [testState, setTestState] = useState<'idle' | 'testing' | 'result'>('idle');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
+
+  // Fallback to hardcoded if not loaded or empty
+  const activeQuestions = pricing.placementQuestions && pricing.placementQuestions.length > 0 
+    ? pricing.placementQuestions 
+    : [
+        {
+          question: "Pilih kalimat yang benar secara tata bahasa (Grammar):",
+          options: [
+            "She don't like apples.",
+            "She doesn't likes apples.",
+            "She doesn't like apples.",
+            "She don't likes apples."
+          ],
+          correctAnswer: 2
+        }
+      ];
 
   const features = [
     { icon: <Clock className="w-6 h-6 text-accent" />, text: "Tes online cepat" },
@@ -49,11 +34,11 @@ export const PlacementTest: React.FC = () => {
   ];
 
   const handleAnswer = (index: number) => {
-    if (index === questions[currentQuestion].correctAnswer) {
+    if (index === activeQuestions[currentQuestion].correctAnswer) {
       setScore(prev => prev + 1);
     }
     
-    if (currentQuestion < questions.length - 1) {
+    if (currentQuestion < activeQuestions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     } else {
       setTestState('result');
@@ -61,12 +46,15 @@ export const PlacementTest: React.FC = () => {
   };
 
   const getResult = () => {
-    if (score === 3) return { 
+    const total = activeQuestions.length;
+    const ratio = score / total;
+
+    if (ratio >= 0.8) return { 
       level: 'Advanced', 
       msg: 'Luar biasa! Anda memiliki dasar bahasa Inggris yang sangat kuat.', 
       rec: 'PTE Class atau Kelas Speaking (Advanced)' 
     };
-    if (score === 2) return { 
+    if (ratio >= 0.5) return { 
       level: 'Intermediate', 
       msg: 'Bagus! Anda sudah cukup paham, tinggal dipoles sedikit lagi.', 
       rec: 'Paket Kelas 1 Bulan (Intermediate)' 
@@ -149,20 +137,20 @@ export const PlacementTest: React.FC = () => {
                 className="relative z-10 w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-lg border border-slate-100 p-8"
               >
                 <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
-                  <span className="font-bold text-slate-400">Pertanyaan {currentQuestion + 1} dari {questions.length}</span>
+                  <span className="font-bold text-slate-400">Pertanyaan {currentQuestion + 1} dari {activeQuestions.length}</span>
                   <div className="flex gap-1">
-                    {questions.map((_, idx) => (
+                    {activeQuestions.map((_, idx) => (
                       <div key={idx} className={`h-2 w-8 rounded-full ${idx <= currentQuestion ? 'bg-primary' : 'bg-slate-200'}`}></div>
                     ))}
                   </div>
                 </div>
 
                 <h3 className="text-2xl font-bold text-slate-800 mb-8 leading-tight">
-                  {questions[currentQuestion].question}
+                  {activeQuestions[currentQuestion].question}
                 </h3>
 
                 <div className="space-y-3">
-                  {questions[currentQuestion].options.map((option, idx) => (
+                  {activeQuestions[currentQuestion].options.map((option, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleAnswer(idx)}

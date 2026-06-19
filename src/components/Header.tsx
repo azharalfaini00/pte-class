@@ -123,54 +123,46 @@ export default function Header({ onNavClick, activeSection }: HeaderProps) {
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            id="mobile-navigation"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="md:hidden bg-white border-b border-slate-200 overflow-hidden"
-          >
-            <div className="px-4 pt-2 pb-6 space-y-1.5">
-              {navItems.map((item) => (
-                <button
-                  id={`mobile-nav-link-${item.id}`}
-                  key={item.id}
-                  onClick={() => handleItemClick(item.id)}
-                  className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
-                    activeSection === item.id
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-              <div className="pt-4 border-t border-slate-100 space-y-3 px-4">
-                <a
-                  id="mobile-whatsapp"
-                  href="https://wa.me/6285860709120"
-                  target="_blank"
-                  referrerPolicy="no-referrer"
-                  className="flex items-center justify-center text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 w-full bg-slate-50 rounded-lg gap-2 border border-slate-100"
-                >
-                  <Phone className="h-4 w-4 text-blue-600" />
-                  <span>CS WhatsApp</span>
-                </a>
-                <button
-                  id="mobile-cta-btn"
-                  onClick={() => handleItemClick('daftar')}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-lg text-sm text-center transition-all cursor-pointer"
-                >
-                  Daftar Sekarang
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div 
+        id="mobile-navigation"
+        className={`md:hidden bg-white border-b border-slate-200 overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}
+      >
+        <div className="px-4 pt-2 pb-6 space-y-1.5">
+          {navItems.map((item) => (
+            <button
+              id={`mobile-nav-link-${item.id}`}
+              key={item.id}
+              onClick={() => handleItemClick(item.id)}
+              className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                activeSection === item.id
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+          <div className="pt-4 border-t border-slate-100 space-y-3 px-4">
+            <a
+              id="mobile-whatsapp"
+              href="https://wa.me/6285860709120"
+              target="_blank"
+              referrerPolicy="no-referrer"
+              className="flex items-center justify-center text-xs font-semibold text-slate-700 hover:text-blue-600 transition-colors py-2.5 w-full bg-slate-50 rounded-lg gap-2 border border-slate-100"
+            >
+              <Phone className="h-4 w-4 text-blue-600" />
+              <span>CS WhatsApp</span>
+            </a>
+            <button
+              id="mobile-cta-btn"
+              onClick={() => handleItemClick('daftar')}
+              className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-lg text-sm text-center transition-all cursor-pointer"
+            >
+              Daftar Sekarang
+            </button>
+          </div>
+        </div>
+      </div>
     </header>
   );
 }

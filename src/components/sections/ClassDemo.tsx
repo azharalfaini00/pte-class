@@ -9,7 +9,21 @@ export const ClassDemo: React.FC = () => {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { pricing } = usePricing();
   
-  const videoUrl = pricing.settings?.demoVideoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+  const rawUrl = pricing.settings?.demoVideoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+  
+  const getEmbedUrl = (url: string) => {
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1].split('&')[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1].split('?')[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return url;
+  };
+  
+  const videoUrl = getEmbedUrl(rawUrl);
 
   const features = [
     { icon: <Video className="w-5 h-5" />, text: "Kualitas HD & Audio Jernih" },
